@@ -1,3 +1,8 @@
 main: com.kzics.crystals.CrystalsPlugin
 version: 1.0.0
 name: Crystals
+commands:
+  energy:
+    description: Get the energy of a crystal
+  crystal:
+    description: Get the type of a crystal
