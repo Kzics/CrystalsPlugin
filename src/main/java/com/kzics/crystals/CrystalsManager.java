@@ -1,42 +1,43 @@
 package com.kzics.crystals;
 
 import com.kzics.crystals.crystals.Ability;
-import com.kzics.crystals.crystals.astral.AstralLeftClickAbility;
-import com.kzics.crystals.crystals.astral.AstralRightClickAbility;
+import com.kzics.crystals.crystals.astral.AstralAbility;
+import com.kzics.crystals.crystals.fire.FireAbility;
+import com.kzics.crystals.crystals.life.LifeAbility;
+import com.kzics.crystals.crystals.puff.PuffAbility;
+import com.kzics.crystals.crystals.speed.SpeedAbility;
+import com.kzics.crystals.crystals.strength.StrengthAbility;
+import com.kzics.crystals.crystals.wealth.WealthAbility;
 import com.kzics.crystals.enums.CrystalType;
+import org.bukkit.block.data.type.Fire;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class CrystalsManager {
 
-    private final Map<CrystalType, List<Ability>> abilities = new HashMap<>();
+    private final Map<CrystalType, Ability> abilities = new HashMap<>();
 
     public CrystalsManager(){
         this.loadAbilities();
     }
 
-    public Ability getAbility(CrystalType type, int level){
-        List<Ability> abilities = this.abilities.get(type);
-        if (abilities == null) return null;
 
-        if(level >= abilities.size()) return null;
 
-        return abilities.get(level);
-    }
+    public Ability getAbilities(CrystalType type){
 
-    public List<Ability> getAbilities(CrystalType type){
-        List<Ability> abilities = this.abilities.get(type);
-        if (abilities == null) return new ArrayList<>();
-
-        return abilities;
+        return this.abilities.get(type);
 
     }
 
     public void loadAbilities(){
-        abilities.put(CrystalType.ASTRAL,List.of(new AstralLeftClickAbility(), new AstralRightClickAbility()));
+        abilities.put(CrystalType.ASTRAL,new AstralAbility());
+        abilities.put(CrystalType.LIFE,new LifeAbility());
+        abilities.put(CrystalType.STRENGTH,new StrengthAbility());
+        abilities.put(CrystalType.PUFF,new PuffAbility());
+        abilities.put(CrystalType.FIRE,new FireAbility());
+        abilities.put(CrystalType.WEALTH,new WealthAbility());
+        abilities.put(CrystalType.SPEED,new SpeedAbility());
     }
 
 }
