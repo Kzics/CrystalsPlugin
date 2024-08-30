@@ -15,7 +15,7 @@ public class EnergyBottleRecipe extends ShapedRecipe {
                 "DGD",
                 "NDN");
 
-        this.setIngredient('N', Material.NETHERITE_INGOT);
+        this.setIngredient('N', Material.NETHERITE_BLOCK);
         this.setIngredient('D', Material.DIAMOND_BLOCK);
         this.setIngredient('G', Material.GOLD_BLOCK);
 

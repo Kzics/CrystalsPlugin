@@ -4,6 +4,7 @@ import com.kzics.crystals.CrystalsPlugin;
 import com.kzics.crystals.crystals.Ability;
 import com.kzics.crystals.enums.CrystalType;
 import com.kzics.crystals.items.CrystalItem;
+import com.kzics.crystals.items.CrystalRerollItem;
 import com.kzics.crystals.items.EnergyBottleItem;
 import org.bukkit.Sound;
 import org.bukkit.entity.Monster;
@@ -13,10 +14,12 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
 
@@ -133,6 +136,26 @@ public class PlayerListeners implements Listener {
             }
         }
         return null;
+    }
+
+    @EventHandler
+    public void onClick(InventoryClickEvent event){
+        final Inventory inventory = event.getClickedInventory();
+
+        if(event.getView().getTitle().equalsIgnoreCase("Recipe Menu")){
+            event.setCancelled(true);
+
+            if(event.getCurrentItem() == null) return;
+
+            if(event.getCurrentItem().getItemMeta() == null) return;
+            final ItemStack item = event.getCurrentItem();
+
+
+            if(item.getItemMeta().getPersistentDataContainer().has(CrystalRerollItem.CRYSTAL_REROLL_KEY, PersistentDataType.STRING)){
+                
+
+            }
+        }
     }
 
     @EventHandler

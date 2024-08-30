@@ -27,7 +27,7 @@ public class CrystalRerollRecipe extends ShapedRecipe {
 
         RecipeChoice.ExactChoice crystalChoice = new RecipeChoice.ExactChoice(crystalItems);
         this.setIngredient('A', crystalChoice);
-        this.setIngredient('N', Material.NETHERITE_INGOT);
+        this.setIngredient('N', Material.NETHERITE_BLOCK);
         this.setIngredient('D', Material.DIAMOND_BLOCK);
 
     }
