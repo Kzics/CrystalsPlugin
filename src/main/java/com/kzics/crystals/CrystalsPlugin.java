@@ -33,11 +33,11 @@ public class CrystalsPlugin extends JavaPlugin {
         CrystalRerollRecipe.register();
         EnergyBottleRecipe.register();
 
-        getCommand("crystal").setExecutor(new CrystalCommand());
+        getCommand("crystal").setExecutor(new CrystalCommand(this));
         getCommand("recipe").setExecutor(new RecipesCommand());
         getCommand("energy").setExecutor(new com.kzics.crystals.commands.energy.EnergyCommand(this));
 
-        getCommand("crystal").setTabCompleter(new com.kzics.crystals.commands.crystal.CrystalCommand());
+        getCommand("crystal").setTabCompleter(new com.kzics.crystals.commands.crystal.CrystalCommand(this));
     }
 
     public static CrystalsPlugin getInstance() {

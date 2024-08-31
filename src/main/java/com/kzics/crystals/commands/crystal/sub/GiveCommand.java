@@ -49,8 +49,7 @@ public class GiveCommand implements ICommand {
 
         player.getInventory().addItem(new CrystalItem(crystalType));
 
-        Ability ability = plugin.getCrystalsManager().getAbilities(type);
+        Ability ability = plugin.getCrystalsManager().getAbilities(crystalType);
         ability.applyEffect(player);
-
     }
 }

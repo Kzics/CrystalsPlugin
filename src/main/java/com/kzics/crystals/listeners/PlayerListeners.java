@@ -23,14 +23,13 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.player.PlayerDropItemEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerItemConsumeEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import java.util.List;
 
@@ -39,6 +38,28 @@ public class PlayerListeners implements Listener {
     private final CrystalsPlugin plugin;
     public PlayerListeners(CrystalsPlugin plugin) {
         this.plugin = plugin;
+    }
+
+    @EventHandler
+    public void onPlayerMove(PlayerMoveEvent event) {
+        Player player = event.getPlayer();
+
+        CrystalType type = hasCrystal(player);
+        if (type == CrystalType.FIRE) {
+            Material blockType = player.getLocation().getBlock().getType();
+
+            if (blockType == Material.FIRE || blockType == Material.SOUL_FIRE || blockType == Material.MAGMA_BLOCK) {
+                player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 20, 1, true, false, false));
+            } else {
+                player.removePotionEffect(PotionEffectType.SPEED);
+            }
+        }else if(type == CrystalType.SPEED){
+            Material blockType = player.getLocation().getBlock().getType();
+
+            if(blockType == Material.SOUL_SAND){
+                player.setWalkSpeed(0.1f);
+            }
+        }
     }
 
     @EventHandler

@@ -1,5 +1,6 @@
 package com.kzics.crystals.commands.crystal;
 
+import com.kzics.crystals.CrystalsPlugin;
 import com.kzics.crystals.commands.CommandBase;
 import com.kzics.crystals.commands.crystal.sub.GiveCommand;
 import org.bukkit.command.Command;
@@ -10,13 +11,18 @@ import java.util.List;
 
 public class CrystalCommand extends CommandBase implements TabCompleter {
 
-    public CrystalCommand(){
-        registerSubCommand("give",new GiveCommand());
+
+    public CrystalCommand(CrystalsPlugin plugin){
+        registerSubCommand("give",new GiveCommand(plugin));
     }
 
 
     @Override
     public List<String> onTabComplete(CommandSender commandSender, Command command, String s, String[] strings) {
+        if(strings.length != 1){
+            return null;
+        }
+
         return List.of("give");
     }
 }
