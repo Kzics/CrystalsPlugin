@@ -68,7 +68,7 @@ public class WealthAbility extends Ability {
 
     @Override
     public String getName() {
-        return "WealthAbility";
+        return "Wealth Crystal";
     }
 
     @Override

@@ -105,7 +105,7 @@ public class AstralAbility extends Ability {
 
     @Override
     public String getName() {
-        return "";
+        return "Astral Crystal";
     }
 
     @Override

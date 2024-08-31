@@ -65,7 +65,7 @@ public class SpeedAbility extends Ability {
 
     @Override
     public String getName() {
-        return "";
+        return "Speed Crystal";
     }
 
     @Override

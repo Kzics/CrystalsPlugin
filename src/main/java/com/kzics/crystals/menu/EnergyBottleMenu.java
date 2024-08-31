@@ -2,6 +2,7 @@ package com.kzics.crystals.menu;
 
 
 
+import com.kzics.crystals.items.EnergyBottleItem;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -13,10 +14,11 @@ public class EnergyBottleMenu {
 
     private final Inventory inventory;
     public EnergyBottleMenu(){
-        this.inventory = Bukkit.createInventory(null, InventoryType.CRAFTING, "Energy Bottle");
+        this.inventory = Bukkit.createInventory(null, InventoryType.WORKBENCH, "Energy Bottle");
     }
 
     public void open(Player player){
+        inventory.setItem(0, new EnergyBottleItem());
 
         inventory.setItem(1, new ItemStack(Material.NETHERITE_BLOCK));
         inventory.setItem(3, new ItemStack(Material.NETHERITE_BLOCK));

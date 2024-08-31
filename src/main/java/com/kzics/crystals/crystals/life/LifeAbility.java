@@ -100,7 +100,7 @@ public class LifeAbility extends Ability {
 
     @Override
     public String getName() {
-        return "";
+        return "Life Ability";
     }
 
     @Override

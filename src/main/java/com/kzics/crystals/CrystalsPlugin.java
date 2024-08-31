@@ -8,7 +8,8 @@ import com.kzics.crystals.recipes.CrystalRerollRecipe;
 import com.kzics.crystals.recipes.EnergyBottleRecipe;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public class CrystalsPlugin extends JavaPlugin {
@@ -16,11 +17,13 @@ public class CrystalsPlugin extends JavaPlugin {
     private static CrystalsPlugin instance;
     private CrystalsManager crystalsManager;
     private EnergyManager energyManager;
+    private List<UUID> disabledCrystals;
 
 
     @Override
     public void onEnable() {
         instance = this;
+        this.disabledCrystals = new ArrayList<>();
         this.energyManager = new EnergyManager();
         this.crystalsManager = new CrystalsManager();
         new CrystalsRunnable(crystalsManager).runTaskTimer(this, 0, 20);
@@ -48,5 +51,9 @@ public class CrystalsPlugin extends JavaPlugin {
 
     public EnergyManager getEnergyManager() {
         return energyManager;
+    }
+
+    public List<UUID> getDisabledCrystals() {
+        return disabledCrystals;
     }
 }

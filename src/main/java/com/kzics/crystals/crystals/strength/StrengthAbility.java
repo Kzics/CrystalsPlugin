@@ -76,7 +76,7 @@ public class StrengthAbility extends Ability {
 
     @Override
     public String getName() {
-        return "";
+        return "Strength Crystal";
     }
 
     @Override

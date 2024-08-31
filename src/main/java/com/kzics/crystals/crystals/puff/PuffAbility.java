@@ -73,7 +73,7 @@ public class PuffAbility extends Ability {
 
     @Override
     public String getName() {
-        return "PuffAbility";
+        return "Puff Crystal";
     }
 
     @Override

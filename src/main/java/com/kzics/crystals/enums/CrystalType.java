@@ -7,7 +7,5 @@ public enum CrystalType {
     PUFF,
     WEALTH,
     SPEED,
-    FIRE,
-    REROLL,
-    ENERGY
+    FIRE
 }

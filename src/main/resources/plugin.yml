@@ -1,6 +1,7 @@
 main: com.kzics.crystals.CrystalsPlugin
 version: 1.0.0
 name: Crystals
+api-version: 1.20
 commands:
   energy:
     description: Get the energy of a crystal

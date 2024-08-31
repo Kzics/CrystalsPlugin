@@ -2,6 +2,8 @@ package com.kzics.crystals.menu;
 
 import com.kzics.crystals.enums.CrystalType;
 import com.kzics.crystals.items.CrystalItem;
+import com.kzics.crystals.items.CrystalRerollItem;
+import com.kzics.crystals.items.EnergyBottleItem;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -14,11 +16,14 @@ public class CrystalRerollMenu {
 
     private final Inventory inventory;
     public CrystalRerollMenu(){
-        this.inventory = Bukkit.createInventory(null, InventoryType.CRAFTING,"Crystal Reroll");
+        this.inventory = Bukkit.createInventory(null, InventoryType.WORKBENCH,"Crystal Reroll");
     }
 
 
     public void open(Player player){
+
+        inventory.setItem(0, new CrystalRerollItem());
+
         inventory.setItem(5, new CrystalItem(CrystalType.ASTRAL));
 
         inventory.setItem(2, new ItemStack(Material.NETHERITE_BLOCK));

@@ -2,13 +2,18 @@ package com.kzics.crystals.listeners;
 
 import com.kzics.crystals.CrystalsPlugin;
 import com.kzics.crystals.crystals.Ability;
+import com.kzics.crystals.crystals.astral.AstralAbility;
 import com.kzics.crystals.enums.CrystalType;
 import com.kzics.crystals.items.CrystalItem;
 import com.kzics.crystals.items.CrystalRerollItem;
 import com.kzics.crystals.items.EnergyBottleItem;
 import com.kzics.crystals.menu.CrystalRerollMenu;
 import com.kzics.crystals.menu.EnergyBottleMenu;
+import com.kzics.crystals.obj.ColorsUtil;
+import org.bukkit.Bukkit;
 import org.bukkit.Sound;
+import org.bukkit.entity.Arrow;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -23,6 +28,7 @@ import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
 import java.util.List;
@@ -101,6 +107,10 @@ public class PlayerListeners implements Listener {
             return;
         }
 
+        if(plugin.getDisabledCrystals().contains(player.getUniqueId())) {
+            player.sendMessage(ColorsUtil.translate.apply("&cYou can't use crystals right now!"));
+        }
+
         if(item.getItemMeta().getPersistentDataContainer().has(CrystalItem.CRYSTAL_TYPE_KEY, PersistentDataType.STRING)){
             CrystalType type = CrystalType.valueOf(item.getItemMeta().getPersistentDataContainer().get(CrystalItem.CRYSTAL_TYPE_KEY, PersistentDataType.STRING));
             Ability ability = CrystalsPlugin.getInstance().getCrystalsManager().getAbilities(type);
@@ -165,34 +175,72 @@ public class PlayerListeners implements Listener {
         }
     }
 
+
     @EventHandler
-    public void onDamage(EntityDamageByEntityEvent event){
-        if(event.getDamager() instanceof Player damager && event.getEntity() instanceof Player victim){
-            Ability ability = CrystalsPlugin.getInstance().getCrystalsManager().getAbilities(hasCrystal(damager));
-            if(ability == null) return;
+    public void onDamage(EntityDamageByEntityEvent event) {
+        Entity damagerEntity = event.getDamager();
+        Entity victimEntity = event.getEntity();
 
-            ability.onDamaged(victim);
+        if (damagerEntity instanceof Player damager && victimEntity instanceof Player victim) {
+            handlePlayerVsPlayerDamage(event, damager, victim);
+        } else if (damagerEntity instanceof Player damager && victimEntity instanceof Monster) {
+            handlePlayerVsMonsterDamage(event, damager);
 
-            if(ability.onDamage(damager)){
-                event.setDamage(event.getDamage() *2);
-                damager.playSound(damager.getLocation(), Sound.BLOCK_ANVIL_BREAK,5f,5f);
-            }
-            if(victim.getHealth() <= 0){
-                ability.onKill(damager);
-
-                plugin.getEnergyManager().addEnergy(damager.getUniqueId(), 1);
-                plugin.getEnergyManager().removeEnergy(victim.getUniqueId(), 1);
-            }
-
-        }else if(event.getDamager() instanceof Player damager && event.getEntity() instanceof Monster){
-
-            CrystalType type = hasCrystal(damager);
-
-            Ability ability = CrystalsPlugin.getInstance().getCrystalsManager().getAbilities(type);
-            if(ability == null) return;
-
-            if(type == CrystalType.LIFE) event.setDamage(event.getDamage() *3);
+        } else if (damagerEntity instanceof Arrow arrow && arrow.getShooter() instanceof Player shooter && victimEntity instanceof Player victim) {
+            handleArrowDamage(event, arrow, shooter, victim);
         }
     }
 
+    private void handlePlayerVsPlayerDamage(EntityDamageByEntityEvent event, Player damager, Player victim) {
+        Ability ability = plugin.getCrystalsManager().getAbilities(hasCrystal(damager));
+        if (ability == null) return;
+
+        ability.onDamaged(victim);
+
+        if (ability.onDamage(damager)) {
+            event.setDamage(event.getDamage() * 2);
+            damager.playSound(damager.getLocation(), Sound.BLOCK_ANVIL_BREAK, 5f, 5f);
+        }
+
+        if (victim.getHealth() <= 0) {
+            ability.onKill(damager);
+            plugin.getEnergyManager().addEnergy(damager.getUniqueId(), 1);
+            plugin.getEnergyManager().removeEnergy(victim.getUniqueId(), 1);
+        }
+    }
+
+    private void handlePlayerVsMonsterDamage(EntityDamageByEntityEvent event, Player damager) {
+        CrystalType type = hasCrystal(damager);
+        Ability ability = plugin.getCrystalsManager().getAbilities(type);
+        if (ability == null) return;
+
+        if (type == CrystalType.LIFE) {
+            event.setDamage(event.getDamage() * 3);
+        }
+    }
+
+    private void handleArrowDamage(EntityDamageByEntityEvent event, Arrow arrow, Player shooter, Player victim) {
+        PersistentDataContainer dataContainer = arrow.getPersistentDataContainer();
+        if (dataContainer.has(AstralAbility.key, PersistentDataType.STRING)) {
+            plugin.getDisabledCrystals().add(shooter.getUniqueId());
+
+            Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                plugin.getDisabledCrystals().remove(shooter.getUniqueId());
+            }, 20 * 10L);
+        }
+
+        Ability ability = plugin.getCrystalsManager().getAbilities(hasCrystal(shooter));
+        if (ability == null) return;
+
+        if (ability.onDamage(shooter)) {
+            event.setDamage(event.getDamage() * 2);
+            shooter.playSound(shooter.getLocation(), Sound.BLOCK_ANVIL_BREAK, 5f, 5f);
+        }
+
+        if (victim.getHealth() <= 0) {
+            ability.onKill(shooter);
+            plugin.getEnergyManager().addEnergy(shooter.getUniqueId(), 1);
+            plugin.getEnergyManager().removeEnergy(victim.getUniqueId(), 1);
+        }
+    }
 }

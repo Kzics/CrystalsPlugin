@@ -102,7 +102,7 @@ public class FireAbility extends Ability {
 
     @Override
     public String getName() {
-        return "FireAbility";
+        return "Fire Crystal";
     }
 
     @Override
