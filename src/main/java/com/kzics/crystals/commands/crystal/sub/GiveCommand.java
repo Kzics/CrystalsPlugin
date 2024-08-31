@@ -1,6 +1,8 @@
 package com.kzics.crystals.commands.crystal.sub;
 
+import com.kzics.crystals.CrystalsPlugin;
 import com.kzics.crystals.commands.ICommand;
+import com.kzics.crystals.crystals.Ability;
 import com.kzics.crystals.enums.CrystalType;
 import com.kzics.crystals.items.CrystalItem;
 import org.bukkit.Bukkit;
@@ -9,8 +11,9 @@ import org.bukkit.entity.Player;
 
 public class GiveCommand implements ICommand {
 
-    public GiveCommand(){
-
+    private final CrystalsPlugin plugin;
+    public GiveCommand(CrystalsPlugin plugin){
+        this.plugin = plugin;
     }
 
     @Override
@@ -45,5 +48,9 @@ public class GiveCommand implements ICommand {
         CrystalType crystalType = CrystalType.valueOf(args[2].toUpperCase());
 
         player.getInventory().addItem(new CrystalItem(crystalType));
+
+        Ability ability = plugin.getCrystalsManager().getAbilities(type);
+        ability.applyEffect(player);
+
     }
 }

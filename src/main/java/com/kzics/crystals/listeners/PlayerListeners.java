@@ -11,15 +11,16 @@ import com.kzics.crystals.menu.CrystalRerollMenu;
 import com.kzics.crystals.menu.EnergyBottleMenu;
 import com.kzics.crystals.obj.ColorsUtil;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.Sound;
-import org.bukkit.entity.Arrow;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Monster;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
@@ -46,6 +47,11 @@ public class PlayerListeners implements Listener {
 
         if(!plugin.getEnergyManager().hasEnergy(player.getUniqueId())){
             plugin.getEnergyManager().addEnergy(player.getUniqueId(), 5);
+        }
+        CrystalType type = hasCrystal(player);
+        if(type != null){
+            Ability ability = plugin.getCrystalsManager().getAbilities(type);
+            ability.applyEffect(player);
         }
 
         player.getInventory().addItem(new CrystalItem(CrystalType.ASTRAL));
@@ -109,6 +115,7 @@ public class PlayerListeners implements Listener {
 
         if(plugin.getDisabledCrystals().contains(player.getUniqueId())) {
             player.sendMessage(ColorsUtil.translate.apply("&cYou can't use crystals right now!"));
+            return;
         }
 
         if(item.getItemMeta().getPersistentDataContainer().has(CrystalItem.CRYSTAL_TYPE_KEY, PersistentDataType.STRING)){
@@ -177,9 +184,66 @@ public class PlayerListeners implements Listener {
 
 
     @EventHandler
+    public void onMine(BlockBreakEvent event){
+        if(event.getBlock().getType().name().contains("ORE")){
+            CrystalType type = hasCrystal(event.getPlayer());
+            if(type == CrystalType.WEALTH){
+                for (ItemStack drop : event.getBlock().getDrops(event.getPlayer().getInventory().getItemInMainHand())) {
+                    event.getBlock().getWorld().dropItemNaturally(event.getBlock().getLocation(), drop.clone());
+                }
+            }else if(type == CrystalType.FIRE){
+                event.setDropItems(false);
+                for (ItemStack drop : event.getBlock().getDrops(event.getPlayer().getInventory().getItemInMainHand())) {
+                    event.getBlock().getWorld().dropItemNaturally(event.getBlock().getLocation(), new ItemStack(getSmeltedItem(drop.getType()), drop.getAmount()));
+                }
+            }
+        }
+    }
+
+    @EventHandler
+    public void onEntityDeath(EntityDeathEvent event) {
+        LivingEntity entity = event.getEntity();
+
+        if (entity.getKiller() != null) {
+            Player killer = entity.getKiller();
+
+            if (hasCrystal(killer) == CrystalType.WEALTH) {
+                for (ItemStack drop : event.getDrops()) {
+                    entity.getWorld().dropItemNaturally(entity.getLocation(), drop.clone());
+                }
+            }
+        }
+    }
+
+    private Material getSmeltedItem(Material material) {
+        switch (material) {
+            case IRON_ORE:
+            case DEEPSLATE_IRON_ORE:
+                return Material.IRON_INGOT;
+            case GOLD_ORE:
+            case DEEPSLATE_GOLD_ORE:
+                return Material.GOLD_INGOT;
+            case COPPER_ORE:
+            case DEEPSLATE_COPPER_ORE:
+                return Material.COPPER_INGOT;
+            case ANCIENT_DEBRIS:
+                return Material.NETHERITE_SCRAP;
+            // Ajoutez d'autres cas si nécessaire
+            default:
+                return null;
+        }
+    }
+    @EventHandler
     public void onDamage(EntityDamageByEntityEvent event) {
         Entity damagerEntity = event.getDamager();
         Entity victimEntity = event.getEntity();
+
+        if(event.getCause().equals(EntityDamageEvent.DamageCause.FALL) && victimEntity instanceof Player) {
+            if(hasCrystal((Player) victimEntity) == CrystalType.PUFF) {
+                event.setCancelled(true);
+            }
+            return;
+        }
 
         if (damagerEntity instanceof Player damager && victimEntity instanceof Player victim) {
             handlePlayerVsPlayerDamage(event, damager, victim);
@@ -202,10 +266,12 @@ public class PlayerListeners implements Listener {
             damager.playSound(damager.getLocation(), Sound.BLOCK_ANVIL_BREAK, 5f, 5f);
         }
 
-        if (victim.getHealth() <= 0) {
+        if (victim.getHealth() - event.getFinalDamage() <= 0) {
             ability.onKill(damager);
-            plugin.getEnergyManager().addEnergy(damager.getUniqueId(), 1);
-            plugin.getEnergyManager().removeEnergy(victim.getUniqueId(), 1);
+            if(plugin.getEnergyManager().getEnergy(victim.getUniqueId()) > 0 ) {
+                plugin.getEnergyManager().addEnergy(damager.getUniqueId(), 1);
+                plugin.getEnergyManager().removeEnergy(victim.getUniqueId(), 1);
+            }
         }
     }
 
@@ -222,7 +288,7 @@ public class PlayerListeners implements Listener {
     private void handleArrowDamage(EntityDamageByEntityEvent event, Arrow arrow, Player shooter, Player victim) {
         PersistentDataContainer dataContainer = arrow.getPersistentDataContainer();
         if (dataContainer.has(AstralAbility.key, PersistentDataType.STRING)) {
-            plugin.getDisabledCrystals().add(shooter.getUniqueId());
+            plugin.getDisabledCrystals().add(victim.getUniqueId());
 
             Bukkit.getScheduler().runTaskLater(plugin, () -> {
                 plugin.getDisabledCrystals().remove(shooter.getUniqueId());

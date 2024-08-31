@@ -39,9 +39,9 @@ public class PuffAbility extends Ability {
 
         Vector direction = player.getLocation().getDirection().normalize();
         player.setVelocity(direction.multiply(5));
-        player.getNearbyEntities(5, 5, 5).forEach(entity -> {
+        player.getNearbyEntities(7, 7, 7).forEach(entity -> {
             if (entity instanceof Player) {
-                ((Player) entity).damage(4); // 2 hearts of damage
+                ((Player) entity).damage(5);
             }
         });
     }

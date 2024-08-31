@@ -97,6 +97,7 @@ public class SpeedAbility extends Ability {
 
     @Override
     public void applyEffect(Player player) {
-        player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 100000, 2));
+        player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 100000000, 2));
+        player.addPotionEffect(new PotionEffect(PotionEffectType.DOLPHINS_GRACE, 100000000, 0));
     }
 }
