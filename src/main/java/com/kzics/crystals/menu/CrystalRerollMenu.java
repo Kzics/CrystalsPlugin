@@ -29,7 +29,7 @@ public class CrystalRerollMenu {
         inventory.setItem(2, new ItemStack(Material.NETHERITE_BLOCK));
         inventory.setItem(4, new ItemStack(Material.NETHERITE_BLOCK));
         inventory.setItem(6, new ItemStack(Material.NETHERITE_BLOCK));
-        inventory.setItem(7, new ItemStack(Material.NETHERITE_BLOCK));
+        inventory.setItem(8, new ItemStack(Material.NETHERITE_BLOCK));
 
         inventory.setItem(1, new ItemStack(Material.DIAMOND_BLOCK));
         inventory.setItem(3, new ItemStack(Material.DIAMOND_BLOCK));

@@ -10,9 +10,12 @@ import com.kzics.crystals.items.EnergyBottleItem;
 import com.kzics.crystals.menu.CrystalRerollMenu;
 import com.kzics.crystals.menu.EnergyBottleMenu;
 import com.kzics.crystals.obj.ColorsUtil;
+import com.kzics.crystals.utils.ArmorEquipEvent;
+import com.kzics.crystals.utils.ArmorUnequipEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -24,8 +27,10 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.*;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.potion.PotionEffect;
@@ -62,6 +67,45 @@ public class PlayerListeners implements Listener {
         }
     }
 
+    @EventHandler
+    public void onArmorUnequip(ArmorUnequipEvent event) {
+        Player player = event.getPlayer();
+        ItemStack item = event.getItem();
+        EquipmentSlot slot = event.getArmorSlot();
+
+        CrystalType type = hasCrystal(player);
+
+        System.out.println("UNEQUIP");
+
+        if (slot == EquipmentSlot.FEET && type == CrystalType.SPEED) {
+            if (item != null && item.getType().name().contains("BOOTS")) {
+                ItemMeta meta = item.getItemMeta();
+                if (meta != null) {
+                    meta.removeEnchant(Enchantment.SOUL_SPEED);
+                    item.setItemMeta(meta);
+                }
+            }
+        }
+    }
+
+    @EventHandler
+    public void onArmorEquip(ArmorEquipEvent event) {
+        Player player = event.getPlayer();
+        ItemStack item = event.getItem();
+        EquipmentSlot slot = event.getArmorSlot();
+
+        System.out.println("EQUIP");
+        CrystalType type = hasCrystal(player);
+        if (slot == EquipmentSlot.FEET && type == CrystalType.SPEED) {
+            if (item != null && item.getType().name().contains("BOOTS")) {
+                ItemMeta meta = item.getItemMeta();
+                if (meta != null) {
+                    meta.addEnchant(Enchantment.SOUL_SPEED, 3, true);
+                    item.setItemMeta(meta);
+                }
+            }
+        }
+    }
     @EventHandler
     public void onJoin(PlayerJoinEvent event){
         final Player player = event.getPlayer();
@@ -150,7 +194,12 @@ public class PlayerListeners implements Listener {
             }
         } else if(item.getItemMeta().getPersistentDataContainer().has(EnergyBottleItem.ENERGY_BOTTLE_KEY, PersistentDataType.STRING)){
             plugin.getEnergyManager().addEnergy(player.getUniqueId(), 1);
-            player.getInventory().remove(item);
+            if(item.getAmount() > 1){
+                item.setAmount(item.getAmount() - 1);
+            }else{
+                player.getInventory().remove(item);
+            }
+
 
             player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 5f, 5f);
             player.sendMessage("§a+1 Energy");
@@ -215,6 +264,7 @@ public class PlayerListeners implements Listener {
             }else if(type == CrystalType.FIRE){
                 event.setDropItems(false);
                 for (ItemStack drop : event.getBlock().getDrops(event.getPlayer().getInventory().getItemInMainHand())) {
+                    if(drop != null)
                     event.getBlock().getWorld().dropItemNaturally(event.getBlock().getLocation(), new ItemStack(getSmeltedItem(drop.getType()), drop.getAmount()));
                 }
             }
@@ -238,18 +288,15 @@ public class PlayerListeners implements Listener {
 
     private Material getSmeltedItem(Material material) {
         switch (material) {
-            case IRON_ORE:
-            case DEEPSLATE_IRON_ORE:
+            case RAW_IRON:
                 return Material.IRON_INGOT;
-            case GOLD_ORE:
-            case DEEPSLATE_GOLD_ORE:
+            case RAW_GOLD:
                 return Material.GOLD_INGOT;
-            case COPPER_ORE:
+            case RAW_COPPER:
             case DEEPSLATE_COPPER_ORE:
                 return Material.COPPER_INGOT;
             case ANCIENT_DEBRIS:
                 return Material.NETHERITE_SCRAP;
-            // Ajoutez d'autres cas si nécessaire
             default:
                 return null;
         }

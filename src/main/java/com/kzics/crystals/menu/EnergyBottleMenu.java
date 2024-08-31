@@ -28,7 +28,7 @@ public class EnergyBottleMenu {
         inventory.setItem(2, new ItemStack(Material.DIAMOND_BLOCK));
         inventory.setItem(4, new ItemStack(Material.DIAMOND_BLOCK));
         inventory.setItem(6, new ItemStack(Material.DIAMOND_BLOCK));
-        inventory.setItem(7, new ItemStack(Material.DIAMOND_BLOCK));
+        inventory.setItem(8, new ItemStack(Material.DIAMOND_BLOCK));
 
         inventory.setItem(5, new ItemStack(Material.GOLD_BLOCK));
 

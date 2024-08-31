@@ -6,6 +6,7 @@ import com.kzics.crystals.data.EnergyManager;
 import com.kzics.crystals.listeners.PlayerListeners;
 import com.kzics.crystals.recipes.CrystalRerollRecipe;
 import com.kzics.crystals.recipes.EnergyBottleRecipe;
+import com.kzics.crystals.utils.ArmorListener;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
@@ -28,6 +29,8 @@ public class CrystalsPlugin extends JavaPlugin {
         this.crystalsManager = new CrystalsManager();
         new CrystalsRunnable(crystalsManager).runTaskTimer(this, 0, 20);
         getServer().getPluginManager().registerEvents(new PlayerListeners(this), this);
+        getServer().getPluginManager().registerEvents(new ArmorListener(), this);
+
         getLogger().info("Crystals plugin enabled");
 
         CrystalRerollRecipe.register();
