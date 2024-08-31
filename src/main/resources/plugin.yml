@@ -6,3 +6,5 @@ commands:
     description: Get the energy of a crystal
   crystal:
     description: Get the type of a crystal
+  recipe:
+    description: Get the recipe of a crystal

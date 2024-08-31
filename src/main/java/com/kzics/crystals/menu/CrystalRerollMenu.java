@@ -14,7 +14,7 @@ public class CrystalRerollMenu {
 
     private final Inventory inventory;
     public CrystalRerollMenu(){
-        this.inventory = Bukkit.createInventory(null, InventoryType.CRAFTING,"Crystal Reroll Menu");
+        this.inventory = Bukkit.createInventory(null, InventoryType.CRAFTING,"Crystal Reroll");
     }
 
 

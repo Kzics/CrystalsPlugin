@@ -6,6 +6,8 @@ import com.kzics.crystals.enums.CrystalType;
 import com.kzics.crystals.items.CrystalItem;
 import com.kzics.crystals.items.CrystalRerollItem;
 import com.kzics.crystals.items.EnergyBottleItem;
+import com.kzics.crystals.menu.CrystalRerollMenu;
+import com.kzics.crystals.menu.EnergyBottleMenu;
 import org.bukkit.Sound;
 import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
@@ -142,6 +144,11 @@ public class PlayerListeners implements Listener {
     public void onClick(InventoryClickEvent event){
         final Inventory inventory = event.getClickedInventory();
 
+        if(event.getView().getTitle().equalsIgnoreCase("Energy Bottle")
+        || event.getView().getTitle().equalsIgnoreCase("Crystal Reroll")){
+            event.setCancelled(true);
+        }
+
         if(event.getView().getTitle().equalsIgnoreCase("Recipe Menu")){
             event.setCancelled(true);
 
@@ -150,10 +157,10 @@ public class PlayerListeners implements Listener {
             if(event.getCurrentItem().getItemMeta() == null) return;
             final ItemStack item = event.getCurrentItem();
 
-
             if(item.getItemMeta().getPersistentDataContainer().has(CrystalRerollItem.CRYSTAL_REROLL_KEY, PersistentDataType.STRING)){
-                
-
+                new CrystalRerollMenu().open((Player) event.getWhoClicked());
+            }else{
+                new EnergyBottleMenu().open((Player) event.getWhoClicked());
             }
         }
     }

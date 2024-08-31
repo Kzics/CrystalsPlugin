@@ -13,7 +13,7 @@ public class EnergyBottleMenu {
 
     private final Inventory inventory;
     public EnergyBottleMenu(){
-        this.inventory = Bukkit.createInventory(null, InventoryType.CRAFTING, "Energy Bottle Menu");
+        this.inventory = Bukkit.createInventory(null, InventoryType.CRAFTING, "Energy Bottle");
     }
 
     public void open(Player player){

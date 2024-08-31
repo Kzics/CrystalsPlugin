@@ -1,6 +1,7 @@
 package com.kzics.crystals;
 
 import com.kzics.crystals.commands.crystal.CrystalCommand;
+import com.kzics.crystals.commands.recipe.RecipesCommand;
 import com.kzics.crystals.data.EnergyManager;
 import com.kzics.crystals.listeners.PlayerListeners;
 import com.kzics.crystals.recipes.CrystalRerollRecipe;
@@ -30,6 +31,7 @@ public class CrystalsPlugin extends JavaPlugin {
         EnergyBottleRecipe.register();
 
         getCommand("crystal").setExecutor(new CrystalCommand());
+        getCommand("recipe").setExecutor(new RecipesCommand());
         getCommand("energy").setExecutor(new com.kzics.crystals.commands.energy.EnergyCommand(this));
 
         getCommand("crystal").setTabCompleter(new com.kzics.crystals.commands.crystal.CrystalCommand());
