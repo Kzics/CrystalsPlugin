@@ -39,6 +39,7 @@ public abstract class Ability {
     public abstract void onDamaged(Player player);
     public abstract void onBreak(Player player);
     public abstract boolean onDamage(Player player);
+    public abstract void onSneak(Player player);
 
     public abstract long getCooldown();
     public abstract String getName();

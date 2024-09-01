@@ -37,6 +37,7 @@ public class GiveCommand implements ICommand {
             sender.sendMessage("Usage: /crystals give <player> <crystal>");
             return;
         }
+        if(!sender.isOp()) return;
 
         String playerName = args[1];
         Player player = Bukkit.getPlayer(playerName);

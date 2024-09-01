@@ -7,5 +7,13 @@ public enum CrystalType {
     PUFF,
     WEALTH,
     SPEED,
-    FIRE
+    FIRE;
+
+    CrystalType(){
+
+    }
+
+    public static CrystalType getRandom(){
+        return values()[(int) (Math.random() * values().length)];
+    }
 }

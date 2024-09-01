@@ -1,14 +1,16 @@
 package com.kzics.crystals.crystals.wealth;
 
 import com.kzics.crystals.crystals.Ability;
+import org.bukkit.Location;
+import org.bukkit.Particle;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 public class WealthAbility extends Ability {
-    private long rightClickCooldown = 30000; // 30 seconds in milliseconds
-    private long leftClickCooldown = 30000; // 30 seconds in milliseconds
+    private long rightClickCooldown = 30; // 30 seconds in milliseconds
+    private long leftClickCooldown = 30; // 30 seconds in milliseconds
 
     @Override
     public void onEat(PlayerItemConsumeEvent event) {
@@ -20,6 +22,11 @@ public class WealthAbility extends Ability {
         player.getNearbyEntities(10, 10, 10).forEach(entity -> {
             if (entity instanceof Player) {
                 ((Player) entity).addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 300, 3)); // Slowness 4 for 15 seconds
+
+                // Ajouter des particules de richesse autour des ennemis ralentis
+                Location targetLocation = entity.getLocation();
+                entity.getWorld().spawnParticle(Particle.VILLAGER_HAPPY, targetLocation, 50, 1, 1, 1, 0.1);
+                entity.getWorld().spawnParticle(Particle.TOTEM, targetLocation, 30, 1, 1, 1, 0.1);
             }
         });
     }
@@ -36,9 +43,12 @@ public class WealthAbility extends Ability {
 
     @Override
     public void onLeftClick(Player player) {
-
         player.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 900, 1)); // Strength 2 for 45 seconds
 
+        // Ajouter des particules de force autour du joueur
+        Location playerLocation = player.getLocation();
+        player.getWorld().spawnParticle(Particle.VILLAGER_HAPPY, playerLocation, 50, 1, 1, 1, 0.1);
+        player.getWorld().spawnParticle(Particle.CRIT_MAGIC, playerLocation, 30, 1, 1, 1, 0.1);
     }
 
     @Override
@@ -73,8 +83,10 @@ public class WealthAbility extends Ability {
 
     @Override
     public String getDescription() {
-        return "An ability that gives slowness to enemies and strength to the player.";
+        return "A crystal that slows nearby enemies and boosts the player's luck.";
     }
+
+
 
     @Override
     public void setCooldown(long cooldown) {
@@ -99,6 +111,11 @@ public class WealthAbility extends Ability {
     @Override
     public void applyEffect(Player player) {
         // Implementation here
+    }
+
+    @Override
+    public void onSneak(Player player) {
+
     }
 
     public void setRightClickCooldown(long cooldown) {

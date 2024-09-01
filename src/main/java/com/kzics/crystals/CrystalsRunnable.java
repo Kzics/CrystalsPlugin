@@ -14,33 +14,44 @@ import net.md_5.bungee.api.chat.TextComponent;
 
 public class CrystalsRunnable extends BukkitRunnable {
     private CrystalsManager crystalsManager;
+    private int counter;
 
     public CrystalsRunnable(CrystalsManager crystalsManager) {
         this.crystalsManager = crystalsManager;
+        this.counter = 0;
     }
 
     @Override
     public void run() {
         for (Player player : Bukkit.getOnlinePlayers()) {
             CrystalType crystalType = hasCrystal(player);
+            if(crystalType == null) return;
             Ability ability = crystalsManager.getAbilities(crystalType);
+            if(ability == null) return;
+            if(crystalType == CrystalType.LIFE){
+                if(player.getHealth() < 20){
+                    if(counter % 5 == 0) player.setHealth(player.getHealth() + 1);
+                }
+            }
 
             long leftCooldown = ability.getRemainingCooldown(player, false);
             long rightCooldown = ability.getRemainingCooldown(player, true);
 
-            String message = "§eLeft Ability Cooldown: ";
+            String message = "§eLeft Ability: ";
             if (leftCooldown <= 0) {
                 message += "§a✅";
             } else {
                 message += "§c"+leftCooldown + "s";
             }
 
-            message += " §f| §eRight Cooldown: ";
+            message += " §f| §eRight Ability: ";
             if (rightCooldown <= 0) {
                 message += "§a✅";
             } else {
                 message += "§c"+rightCooldown + "s";
             }
+
+            if(counter >= 100) counter = 0;
 
             player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(message));
         }
@@ -48,6 +59,7 @@ public class CrystalsRunnable extends BukkitRunnable {
 
     public CrystalType hasCrystal(Player player){
         for(ItemStack item : player.getInventory().getContents()){
+            if(item == null) continue;
             if(item.getItemMeta() == null){
                 continue;
             }

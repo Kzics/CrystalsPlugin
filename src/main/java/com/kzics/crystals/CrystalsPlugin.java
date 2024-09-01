@@ -23,9 +23,13 @@ public class CrystalsPlugin extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        if(!getDataFolder().exists()) getDataFolder().mkdir();
+
         instance = this;
         this.disabledCrystals = new ArrayList<>();
-        this.energyManager = new EnergyManager();
+        this.energyManager = new EnergyManager(getDataFolder() + "/energy.json");
+        energyManager.loadData();
+
         this.crystalsManager = new CrystalsManager();
         new CrystalsRunnable(crystalsManager).runTaskTimer(this, 0, 20);
         getServer().getPluginManager().registerEvents(new PlayerListeners(this), this);
@@ -41,6 +45,12 @@ public class CrystalsPlugin extends JavaPlugin {
         getCommand("energy").setExecutor(new com.kzics.crystals.commands.energy.EnergyCommand(this));
 
         getCommand("crystal").setTabCompleter(new com.kzics.crystals.commands.crystal.CrystalCommand(this));
+    }
+
+    @Override
+    public void onDisable() {
+        energyManager.saveData();
+        getLogger().info("Crystals plugin disabled");
     }
 
     public static CrystalsPlugin getInstance() {

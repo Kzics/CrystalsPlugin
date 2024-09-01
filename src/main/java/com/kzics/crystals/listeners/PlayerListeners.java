@@ -8,28 +8,26 @@ import com.kzics.crystals.items.CrystalItem;
 import com.kzics.crystals.items.CrystalRerollItem;
 import com.kzics.crystals.items.EnergyBottleItem;
 import com.kzics.crystals.menu.CrystalRerollMenu;
+import com.kzics.crystals.menu.CrystalSpinMenu;
 import com.kzics.crystals.menu.EnergyBottleMenu;
 import com.kzics.crystals.obj.ColorsUtil;
 import com.kzics.crystals.utils.ArmorEquipEvent;
 import com.kzics.crystals.utils.ArmorUnequipEvent;
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
-import org.bukkit.Sound;
+import org.bukkit.*;
+import org.bukkit.block.BlockFace;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.entity.*;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.MerchantRecipe;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
@@ -41,8 +39,20 @@ import java.util.List;
 public class PlayerListeners implements Listener {
 
     private final CrystalsPlugin plugin;
+    private static final NamespacedKey DISCOUNT_APPLIED_KEY = new NamespacedKey("yourplugin", "discount_applied");
+
     public PlayerListeners(CrystalsPlugin plugin) {
         this.plugin = plugin;
+    }
+
+    @EventHandler
+    public void onSneak(PlayerToggleSneakEvent event) {
+        Player player = event.getPlayer();
+        CrystalType type = hasCrystal(player);
+        if (type == CrystalType.PUFF) {
+            Ability ability = plugin.getCrystalsManager().getAbilities(type);
+            ability.onSneak(player);
+        }
     }
 
     @EventHandler
@@ -57,12 +67,6 @@ public class PlayerListeners implements Listener {
                 player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 20, 1, true, false, false));
             } else {
                 player.removePotionEffect(PotionEffectType.SPEED);
-            }
-        }else if(type == CrystalType.SPEED){
-            Material blockType = player.getLocation().getBlock().getType();
-
-            if(blockType == Material.SOUL_SAND){
-                player.setWalkSpeed(0.1f);
             }
         }
     }
@@ -170,20 +174,73 @@ public class PlayerListeners implements Listener {
     }
 
     @EventHandler
+    public void onPlayerInteractWithVillager(PlayerInteractEntityEvent event) {
+        if (event.getRightClicked() instanceof Villager villager) {
+            Player player = event.getPlayer();
+
+            if (hasCrystal(player) == CrystalType.WEALTH) {
+                if (isDiscountApplied(villager)) {
+                    return;
+                }
+
+                List<MerchantRecipe> trades = villager.getRecipes();
+                for (MerchantRecipe trade : trades) {
+                    List<ItemStack> ingredients = trade.getIngredients();
+                    for (ItemStack ingredient : ingredients) {
+                        if (ingredient != null && ingredient.getAmount() > 1) {
+                            int originalAmount = ingredient.getAmount();
+                            int discountedAmount = (int) Math.ceil(originalAmount * 0.5);
+                            ingredient.setAmount(discountedAmount);
+                        }
+                    }
+                    trade.setIngredients(ingredients);
+                }
+                villager.setRecipes(trades);
+
+                markDiscountApplied(villager);
+                player.sendMessage("§aDiscount applied!");
+            }
+        }else if (event.getRightClicked() instanceof Animals) {
+            Animals animal = (Animals) event.getRightClicked();
+            if (event.getPlayer().getInventory().getItemInMainHand().getType() == Material.AIR) {
+                animal.setLoveModeTicks(600);
+                event.getPlayer().getWorld().spawnParticle(Particle.HEART, animal.getLocation(), 10);
+            }
+        }
+
+    }
+    private boolean isDiscountApplied(Villager villager) {
+        return villager.getPersistentDataContainer().has(DISCOUNT_APPLIED_KEY, PersistentDataType.BYTE);
+    }
+    private void markDiscountApplied(Villager villager) {
+        villager.getPersistentDataContainer().set(DISCOUNT_APPLIED_KEY, PersistentDataType.BYTE, (byte) 1);
+    }
+
+    @EventHandler
     public void onInteract(PlayerInteractEvent event){
         final Player player = event.getPlayer();
         final ItemStack item = player.getInventory().getItemInMainHand();
+
+        if(hasCrystal(player) == CrystalType.LIFE){
+            if (player.getInventory().getItemInMainHand().getType() == Material.AIR) {
+                if (event.getClickedBlock() != null) {
+                    event.getClickedBlock().applyBoneMeal(BlockFace.UP);
+                    player.getWorld().spawnParticle(Particle.VILLAGER_HAPPY, event.getClickedBlock().getLocation(), 10);
+                }
+            }
+
+        }
 
         if(item.getItemMeta() == null){
             return;
         }
 
-        if(plugin.getDisabledCrystals().contains(player.getUniqueId())) {
-            player.sendMessage(ColorsUtil.translate.apply("&cYou can't use crystals right now!"));
-            return;
-        }
-
         if(item.getItemMeta().getPersistentDataContainer().has(CrystalItem.CRYSTAL_TYPE_KEY, PersistentDataType.STRING)){
+            if(plugin.getDisabledCrystals().contains(player.getUniqueId()) || plugin.getEnergyManager().getEnergy(player.getUniqueId()) <= 0){
+                player.sendMessage(ColorsUtil.translate.apply("&cYou can't use crystals right now!"));
+                return;
+            }
+
             CrystalType type = CrystalType.valueOf(item.getItemMeta().getPersistentDataContainer().get(CrystalItem.CRYSTAL_TYPE_KEY, PersistentDataType.STRING));
             Ability ability = CrystalsPlugin.getInstance().getCrystalsManager().getAbilities(type);
 
@@ -203,7 +260,13 @@ public class PlayerListeners implements Listener {
 
             player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 5f, 5f);
             player.sendMessage("§a+1 Energy");
+        } else if(item.getItemMeta().getPersistentDataContainer().has(CrystalRerollItem.CRYSTAL_REROLL_KEY, PersistentDataType.STRING)){
+
+            item.setAmount(item.getAmount() - 1);
+            new CrystalSpinMenu(plugin).open(player);
+
         }
+
     }
 
     @EventHandler
@@ -232,7 +295,8 @@ public class PlayerListeners implements Listener {
         final Inventory inventory = event.getClickedInventory();
 
         if(event.getView().getTitle().equalsIgnoreCase("Energy Bottle")
-        || event.getView().getTitle().equalsIgnoreCase("Crystal Reroll")){
+        || event.getView().getTitle().equalsIgnoreCase("Crystal Reroll") ||
+        event.getView().getTitle().equalsIgnoreCase("Crystal Spin Menu")){
             event.setCancelled(true);
         }
 
@@ -301,17 +365,21 @@ public class PlayerListeners implements Listener {
                 return null;
         }
     }
+
     @EventHandler
-    public void onDamage(EntityDamageByEntityEvent event) {
-        Entity damagerEntity = event.getDamager();
+    public void onMiscDamage(EntityDamageEvent event){
         Entity victimEntity = event.getEntity();
 
         if(event.getCause().equals(EntityDamageEvent.DamageCause.FALL) && victimEntity instanceof Player) {
             if(hasCrystal((Player) victimEntity) == CrystalType.PUFF) {
                 event.setCancelled(true);
             }
-            return;
         }
+    }
+    @EventHandler
+    public void onDamage(EntityDamageByEntityEvent event) {
+        Entity damagerEntity = event.getDamager();
+        Entity victimEntity = event.getEntity();
 
         if (damagerEntity instanceof Player damager && victimEntity instanceof Player victim) {
             handlePlayerVsPlayerDamage(event, damager, victim);
