@@ -41,7 +41,6 @@ public class FireAbility extends Ability {
 
         fireball.setMetadata("damage", new FixedMetadataValue(CrystalsPlugin.getInstance(), 10));
 
-        // Ajouter des particules autour de la boule de feu
         new BukkitRunnable() {
             @Override
             public void run() {
@@ -74,7 +73,6 @@ public class FireAbility extends Ability {
                     player.setHealth(Math.min(player.getHealth() + 2, player.getMaxHealth()));
                     world.spawnParticle(Particle.VILLAGER_HAPPY, location.clone().add(0.5, 1, 0.5), 10, 0.5, 0.5, 0.5, 0); // Green particles
 
-                    // Ajouter un cercle de particules autour du joueur
                     double radius = 1.5;
                     for (int i = 0; i < 360; i += 10) {
                         double angle = Math.toRadians(i);
@@ -85,6 +83,7 @@ public class FireAbility extends Ability {
 
                     seconds++;
                 } else {
+                    world.getBlockAt(location).setType(Material.AIR);
                     this.cancel();
                 }
             }

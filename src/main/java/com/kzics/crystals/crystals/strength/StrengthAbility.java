@@ -38,7 +38,6 @@ public class StrengthAbility extends Ability {
                 target.removePotionEffect(potionEffect.getType());
             }
 
-            // Ajouter des particules de dissipation autour du joueur cible
             Location targetLocation = target.getLocation();
             target.getWorld().spawnParticle(Particle.SPELL_WITCH, targetLocation, 50, 1, 1, 1, 0.1);
             target.getWorld().spawnParticle(Particle.SMOKE_NORMAL, targetLocation, 30, 1, 1, 1, 0.1);
