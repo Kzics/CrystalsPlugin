@@ -51,7 +51,7 @@ public class CrystalsPlugin extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        energyManager.saveData();
+        this.energyManager.saveData();
         getLogger().info("Crystals plugin disabled");
     }
 

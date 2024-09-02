@@ -33,7 +33,6 @@ public class CrystalItem extends ItemStack {
         // Lore with a simplified color scheme
         List<String> lore = new ArrayList<>();
         lore.add(ChatColor.GRAY + ability.getDescription());
-        lore.add("");
         lore.add(ChatColor.of("#66CC66") + "Abilities:");
         lore.add(ChatColor.of("#66CC66") + "Right Click: " + ChatColor.YELLOW + ability.getRightClickDescription());
         lore.add(ChatColor.of("#66CC66") + "Left Click: " + ChatColor.YELLOW + ability.getLeftClickDescription());
