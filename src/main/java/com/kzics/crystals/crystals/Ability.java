@@ -1,5 +1,6 @@
 package com.kzics.crystals.crystals;
 
+import com.kzics.crystals.obj.ColorsUtil;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 
@@ -15,7 +16,7 @@ public abstract class Ability {
 
     public boolean activateRightClick(Player player) {
         if (!checkCooldown(player, rightClickCooldowns)) {
-            player.sendMessage("Right-click ability is on cooldown!");
+            player.sendMessage(ColorsUtil.gradientText("Right-click ability is on cooldown!","#d10000","#e60000"));
             return false;
         }
         onRightClick(player);
@@ -24,7 +25,7 @@ public abstract class Ability {
 
     public boolean activateLeftClick(Player player) {
         if (!checkCooldown(player, leftClickCooldowns)) {
-            player.sendMessage("Left-click ability is on cooldown!");
+            player.sendMessage(ColorsUtil.gradientText("Left-click ability is on cooldown!","#d10000","#e60000"));
             return false;
         }
         onLeftClick(player);

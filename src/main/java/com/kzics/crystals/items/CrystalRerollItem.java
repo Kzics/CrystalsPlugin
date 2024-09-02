@@ -22,7 +22,6 @@ public class CrystalRerollItem extends ItemStack {
         String displayName = ColorsUtil.gradientText("Crystal Reroll", "#FF00FF", "#0000FF");
         meta.setDisplayName(displayName);
 
-        // Ajout d'un espace entre le nom et le lore
         meta.setLore(Arrays.asList(
                 "",
                 ColorsUtil.gradientText("Use this item to reroll your crystal.", "#FF00FF", "#FF00CC")

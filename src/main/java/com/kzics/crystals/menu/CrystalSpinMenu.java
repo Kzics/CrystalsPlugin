@@ -1,6 +1,7 @@
 package com.kzics.crystals.menu;
 
 import com.kzics.crystals.CrystalsPlugin;
+import com.kzics.crystals.crystals.Ability;
 import com.kzics.crystals.enums.CrystalType;
 import com.kzics.crystals.items.CrystalItem;
 import com.kzics.crystals.obj.ColorsUtil;
@@ -12,6 +13,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
@@ -68,7 +70,7 @@ public class CrystalSpinMenu {
     private void startSpinning(Player player) {
         new BukkitRunnable() {
             int ticks = 0;
-            int maxTicks = 40; // Increased to provide a longer spinning effect
+            int maxTicks = 40;
 
             @Override
             public void run() {
@@ -83,7 +85,13 @@ public class CrystalSpinMenu {
 
                             player.getInventory().remove(itemStack);
 
-                            // Copy the damage value from the middle item to the player's item
+                            CrystalType crystalType = CrystalType.valueOf(itemStack.getItemMeta().getPersistentDataContainer().get(CrystalItem.CRYSTAL_TYPE_KEY, PersistentDataType.STRING));
+                            Ability ability = instance.getCrystalsManager().getAbilities(crystalType);
+                            for (PotionEffectType effect : PotionEffectType.values()) {
+                                player.removePotionEffect(effect);
+                            }
+                            ability.applyEffect(player);
+
                             Damageable middleMeta = (Damageable) middleItem.getItemMeta();
                             Damageable itemStackMeta = (Damageable) itemStack.getItemMeta();
                             middleMeta.setDamage(itemStackMeta.getDamage());
@@ -97,7 +105,6 @@ public class CrystalSpinMenu {
                     return;
                 }
 
-                // Shift items to create spinning effect
                 ItemStack lastItem = inventory.getItem(inventory.getSize() - 1);
                 for (int i = inventory.getSize() - 1; i > 0; i--) {
                     inventory.setItem(i, inventory.getItem(i - 1));

@@ -9,6 +9,7 @@ import com.kzics.crystals.recipes.EnergyBottleRecipe;
 import com.kzics.crystals.utils.ArmorListener;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -24,6 +25,7 @@ public class CrystalsPlugin extends JavaPlugin {
     @Override
     public void onEnable() {
         if(!getDataFolder().exists()) getDataFolder().mkdir();
+        if(!new File(getDataFolder() + "/energy.json").exists()) saveResource("energy.json", false);
 
         instance = this;
         this.disabledCrystals = new ArrayList<>();

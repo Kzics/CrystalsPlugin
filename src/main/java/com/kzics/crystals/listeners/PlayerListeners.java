@@ -35,6 +35,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import java.util.List;
+import java.util.Random;
 
 public class PlayerListeners implements Listener {
 
@@ -117,32 +118,25 @@ public class PlayerListeners implements Listener {
         if(!plugin.getEnergyManager().hasEnergy(player.getUniqueId())){
             plugin.getEnergyManager().addEnergy(player.getUniqueId(), 5);
         }
+
         CrystalType type = hasCrystal(player);
-        if(type != null){
+        if (type != null) {
             Ability ability = plugin.getCrystalsManager().getAbilities(type);
             ability.applyEffect(player);
-        }
+        } else {
+            List<CrystalType> crystalTypes = List.of(CrystalType.values());
+            Random random = new Random();
+            CrystalType randomType = crystalTypes.get(random.nextInt(crystalTypes.size()));
 
-        player.getInventory().addItem(new CrystalItem(CrystalType.ASTRAL));
-        player.getInventory().addItem(new CrystalItem(CrystalType.ASTRAL));
-        player.getInventory().addItem(new CrystalItem(CrystalType.ASTRAL));
-        player.getInventory().addItem(new CrystalItem(CrystalType.ASTRAL));
-        player.getInventory().addItem(new CrystalItem(CrystalType.ASTRAL));
-        player.getInventory().addItem(new CrystalItem(CrystalType.ASTRAL));
-        player.getInventory().addItem(new CrystalItem(CrystalType.ASTRAL));
-        player.getInventory().addItem(new CrystalItem(CrystalType.ASTRAL));
-        player.getInventory().addItem(new CrystalItem(CrystalType.ASTRAL));
-        player.getInventory().addItem(new CrystalItem(CrystalType.ASTRAL));
-        player.getInventory().addItem(new CrystalItem(CrystalType.ASTRAL));
-        player.getInventory().addItem(new CrystalItem(CrystalType.ASTRAL));
-        player.getInventory().addItem(new CrystalItem(CrystalType.ASTRAL));
-        player.getInventory().addItem(new CrystalItem(CrystalType.ASTRAL));
-        player.getInventory().addItem(new CrystalItem(CrystalType.LIFE));
-        player.getInventory().addItem(new CrystalItem(CrystalType.STRENGTH));
-        player.getInventory().addItem(new CrystalItem(CrystalType.PUFF));
-        player.getInventory().addItem(new CrystalItem(CrystalType.SPEED));
-        player.getInventory().addItem(new CrystalItem(CrystalType.WEALTH));
-        player.getInventory().addItem(new CrystalItem(CrystalType.FIRE));
+            ItemStack crystalItem = new CrystalItem(randomType);
+
+            player.getInventory().addItem(crystalItem);
+
+            Ability ability = plugin.getCrystalsManager().getAbilities(randomType);
+            if (ability != null) {
+                ability.applyEffect(player);
+            }
+        }
     }
 
     @EventHandler

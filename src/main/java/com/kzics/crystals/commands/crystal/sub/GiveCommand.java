@@ -5,9 +5,11 @@ import com.kzics.crystals.commands.ICommand;
 import com.kzics.crystals.crystals.Ability;
 import com.kzics.crystals.enums.CrystalType;
 import com.kzics.crystals.items.CrystalItem;
+import com.kzics.crystals.obj.ColorsUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffectType;
 
 public class GiveCommand implements ICommand {
 
@@ -34,7 +36,7 @@ public class GiveCommand implements ICommand {
     @Override
     public void execute(CommandSender sender, String[] args) {
         if (args.length != 3) {
-            sender.sendMessage("Usage: /crystals give <player> <crystal>");
+            sender.sendMessage(ColorsUtil.translate.apply("&cUsage: /crystals give <player> <crystal>"));
             return;
         }
         if(!sender.isOp()) return;
@@ -42,7 +44,7 @@ public class GiveCommand implements ICommand {
         String playerName = args[1];
         Player player = Bukkit.getPlayer(playerName);
         if(player == null){
-            sender.sendMessage("Player not found.");
+            sender.sendMessage(ColorsUtil.translate.apply("&cPlayer not found."));
             return;
         }
 
@@ -50,6 +52,9 @@ public class GiveCommand implements ICommand {
 
         player.getInventory().addItem(new CrystalItem(crystalType));
 
+        for (PotionEffectType effect : PotionEffectType.values()) {
+            player.removePotionEffect(effect);
+        }
         Ability ability = plugin.getCrystalsManager().getAbilities(crystalType);
         ability.applyEffect(player);
     }
