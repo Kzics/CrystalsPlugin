@@ -18,6 +18,7 @@ public class CrystalRerollItem extends ItemStack {
         ItemMeta meta = getItemMeta();
         meta.getPersistentDataContainer().set(CRYSTAL_REROLL_KEY, org.bukkit.persistence.PersistentDataType.STRING, "crystal-reroll");
 
+        meta.setCustomModelData(1);
         // Nom avec gradient et contraste fort
         String displayName = ColorsUtil.gradientText("Crystal Reroll", "#FF00FF", "#0000FF");
         meta.setDisplayName(displayName);

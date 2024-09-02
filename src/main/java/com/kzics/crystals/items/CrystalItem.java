@@ -30,6 +30,7 @@ public class CrystalItem extends ItemStack {
         String displayName = ColorsUtil.gradientText(ability.getName(), "#FFCC00", "#FF9900");
         meta.setDisplayName(displayName);
 
+        meta.setCustomModelData(type.getDataId());
         // Lore with a simplified color scheme
         List<String> lore = new ArrayList<>();
         lore.add(ChatColor.GRAY + ability.getDescription());

@@ -23,11 +23,9 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.*;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.PrepareItemCraftEvent;
 import org.bukkit.event.player.*;
-import org.bukkit.inventory.EquipmentSlot;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.MerchantRecipe;
+import org.bukkit.inventory.*;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
@@ -271,9 +269,53 @@ public class PlayerListeners implements Listener {
 
         ability.onEat(event);
     }
+    @EventHandler
+    public void onPrepareCraft(PrepareItemCraftEvent event) {
+        CraftingInventory inventory = event.getInventory();
+
+        ItemStack centerItem = inventory.getItem(4);
+
+        boolean isRecipeValid = true;
+
+        // Check the center item
+        if (centerItem == null || centerItem.getType() != Material.PRISMARINE_CRYSTALS ||
+                !centerItem.getItemMeta().getPersistentDataContainer().has(CrystalItem.CRYSTAL_TYPE_KEY, PersistentDataType.STRING)) {
+            isRecipeValid = false;
+        }
+
+        // Check the surrounding ingredients
+        if (isRecipeValid) {
+            // Check Netherite Blocks (N)
+            if (inventory.getItem(1) == null || inventory.getItem(1).getType() != Material.NETHERITE_BLOCK ||
+                    inventory.getItem(3) == null || inventory.getItem(3).getType() != Material.NETHERITE_BLOCK ||
+                    inventory.getItem(7) == null || inventory.getItem(7).getType() != Material.NETHERITE_BLOCK ||
+                    inventory.getItem(5) == null || inventory.getItem(5).getType() != Material.NETHERITE_BLOCK) {
+                isRecipeValid = false;
+            }
+
+            // Check Diamond Blocks (D)
+            if (isRecipeValid) {
+                if (inventory.getItem(0) == null || inventory.getItem(0).getType() != Material.DIAMOND_BLOCK ||
+                        inventory.getItem(2) == null || inventory.getItem(2).getType() != Material.DIAMOND_BLOCK ||
+                        inventory.getItem(6) == null || inventory.getItem(6).getType() != Material.DIAMOND_BLOCK ||
+                        inventory.getItem(8) == null || inventory.getItem(8).getType() != Material.DIAMOND_BLOCK) {
+                    isRecipeValid = false;
+                }
+            }
+        }
+
+        CrystalType type = CrystalType.valueOf(centerItem.getItemMeta().getPersistentDataContainer().get(CrystalItem.CRYSTAL_TYPE_KEY, PersistentDataType.STRING));
+
+        if (isRecipeValid) {
+            event.getInventory().setResult(new CrystalItem(type));
+        } else {
+            event.getInventory().setResult(null);
+        }
+    }
 
     public CrystalType hasCrystal(Player player){
         for(ItemStack item : player.getInventory().getContents()){
+            if(item == null) continue;
             if(item.getItemMeta() == null){
                 continue;
             }

@@ -18,10 +18,9 @@ public class EnergyBottleItem extends ItemStack {
 
         ItemMeta meta = this.getItemMeta();
 
-        // Nom avec gradient et contraste fort
         meta.setDisplayName(ColorsUtil.gradientText("Energy Bottle", "#4dff36", "#4dff36"));
 
-        // Ajout d'un espace entre le nom et le lore
+        meta.setCustomModelData(1);
         meta.setLore(List.of(
                 "",
                 ColorsUtil.gradientText("Use this to earn 1 energy point.", "#32CD32", "#00FF00")
